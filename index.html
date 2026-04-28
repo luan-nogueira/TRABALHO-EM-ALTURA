@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AlturaSafe Monitor</title>
+  <meta name="theme-color" content="#0a192f" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <section id="welcomeScreen" class="welcome-screen">
+    <div class="welcome-overlay"></div>
+    <div class="welcome-card">
+      <div class="welcome-badge">Segurança do Trabalho</div>
+      <h1>AlturaSafe Monitor</h1>
+      <p>Checklist técnico para trabalho em altura em atividades de CFTV, câmeras e controle de acesso, com registros em tempo real.</p>
+      <button id="enterSystemBtn" class="btn btn-primary btn-xl" type="button">Entrar no sistema</button>
+    </div>
+  </section>
+
+  <div class="app hidden" id="appShell">
+    <header class="topbar">
+      <div>
+        <span class="topbar-badge">Registro em tempo real</span>
+        <div class="brand-wrap">
+          <div class="brand-icon">🧗</div>
+          <div class="brand-text">
+            <h1>AlturaSafe Monitor</h1>
+            <p>Checklist Técnico – Trabalho em Altura</p>
+          </div>
+        </div>
+      </div>
+      <button id="btnToggleTheme" class="btn btn-light btn-icon" type="button">🌙</button>
+    </header>
+
+    <main class="app-content">
+      <section class="summary-grid">
+        <article class="summary-card">
+          <span>Total de registros</span>
+          <strong id="totalRegistros">0</strong>
+        </article>
+        <article class="summary-card">
+          <span>Registros hoje</span>
+          <strong id="totalHoje">0</strong>
+        </article>
+        <article class="summary-card alert">
+          <span>Com alerta</span>
+          <strong id="totalAlertas">0</strong>
+        </article>
+        <article class="summary-card danger-soft">
+          <span>Risco alto</span>
+          <strong id="totalRiscoAlto">0</strong>
+        </article>
+        <article class="summary-card wide">
+          <span>Última atualização</span>
+          <strong id="ultimaAtualizacao">--</strong>
+        </article>
+      </section>
+
+      <section class="panel card">
+        <div class="section-head">
+          <div>
+            <h2 id="formTitle">Novo checklist</h2>
+            <p id="formSubtitle">Preencha os dados da atividade e marque os itens de segurança.</p>
+          </div>
+        </div>
+
+        <form id="formChecklist" class="form-grid">
+          <div class="info-box">
+            <strong>Objetivo:</strong> garantir execução segura, conforme NR-06, NR-01 e boas práticas de campo.
+          </div>
+
+          <div class="grid-3">
+            <div class="field">
+              <label for="dataRegistro">Data e hora</label>
+              <input id="dataRegistro" type="datetime-local" required />
+            </div>
+            <div class="field">
+              <label for="localCliente">Local / Cliente</label>
+              <input id="localCliente" type="text" placeholder="Ex.: Cliente / unidade" required />
+            </div>
+            <div class="field">
+              <label for="atividade">Atividade</label>
+              <input id="atividade" type="text" placeholder="Ex.: Instalação de câmera" required />
+            </div>
+            <div class="field">
+              <label for="alturaAproximada">Altura aproximada</label>
+              <input id="alturaAproximada" type="text" placeholder="Ex.: 3 metros" required />
+            </div>
+            <div class="field">
+              <label for="tst">TST</label>
+              <input id="tst" type="text" placeholder="Nome do TST" />
+            </div>
+            <div class="field">
+              <label for="tecnico">Técnico executante</label>
+              <input id="tecnico" type="text" placeholder="Nome do técnico" required />
+            </div>
+          </div>
+
+          <div id="checklistContainer" class="checklist-wrapper"></div>
+
+          <section class="checklist-section">
+            <div class="checklist-header">
+              <h3>Classificação do risco</h3>
+              <p>Selecione o nível de risco da atividade.</p>
+            </div>
+            <div class="risk-options">
+              <label class="risk-pill low">
+                <input type="radio" name="classificacaoRisco" value="Baixo" required />
+                Baixo
+              </label>
+              <label class="risk-pill medium">
+                <input type="radio" name="classificacaoRisco" value="Médio" required />
+                Médio
+              </label>
+              <label class="risk-pill high">
+                <input type="radio" name="classificacaoRisco" value="Alto" required />
+                Alto
+              </label>
+            </div>
+          </section>
+
+          <div class="message-box" id="saveMsg">Sistema pronto para uso.</div>
+
+          <div class="actions-bar">
+            <button id="cancelEditBtn" class="btn btn-light" type="button" hidden>Cancelar edição</button>
+            <button id="submitBtn" class="btn btn-primary" type="submit">Salvar checklist</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel card">
+        <div class="section-head section-head-stack">
+          <div>
+            <h2>Registros</h2>
+            <p>Clique em um registro para visualizar, editar ou excluir.</p>
+          </div>
+
+          <div class="filters-bar">
+            <div class="field">
+              <label for="filtroTecnico">Técnico</label>
+              <input id="filtroTecnico" type="text" placeholder="Buscar técnico..." />
+            </div>
+            <div class="field">
+              <label for="filtroCliente">Cliente / Local</label>
+              <input id="filtroCliente" type="text" placeholder="Buscar cliente..." />
+            </div>
+            <div class="field">
+              <label for="filtroRisco">Risco</label>
+              <select id="filtroRisco">
+                <option value="">Todos</option>
+                <option value="Baixo">Baixo</option>
+                <option value="Médio">Médio</option>
+                <option value="Alto">Alto</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="filtroDataInicio">Data inicial</label>
+              <input id="filtroDataInicio" type="date" />
+            </div>
+            <div class="field">
+              <label for="filtroDataFim">Data final</label>
+              <input id="filtroDataFim" type="date" />
+            </div>
+          </div>
+
+          <div class="toolbar-bar">
+            <button id="btnLimparFiltros" class="btn btn-light" type="button">Limpar filtros</button>
+            <button id="btnExportarExcel" class="btn btn-primary" type="button">Exportar Excel</button>
+          </div>
+        </div>
+
+        <ul id="lista" class="records-list"></ul>
+
+        <div class="load-more-wrap">
+          <button id="btnVerMais" class="btn btn-light" type="button">Ver mais</button>
+          <button id="btnVerMenos" class="btn btn-light" type="button">Ver menos</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="detailsModal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 id="modalTitle">Detalhes do checklist</h3>
+          <p id="modalSubtitle">Registro completo</p>
+        </div>
+        <button id="closeModalBtn" class="modal-close" type="button">×</button>
+      </div>
+      <div id="modalBody" class="modal-body"></div>
+      <div class="modal-actions">
+        <button id="modalDeleteBtn" class="btn btn-danger" type="button">Excluir</button>
+        <button id="modalEditBtn" class="btn btn-primary" type="button">Editar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
